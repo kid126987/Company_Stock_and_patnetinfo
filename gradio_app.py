@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 import sqlalchemy
 import pandas as pd
 import google.generativeai as genai
-from sidepro.baseENV import googleapikey
+from baseENV import googleapikey
 
 #connect the stock_database.db
 engine = sqlalchemy.create_engine('sqlite:///stock_database.db', echo=False)
@@ -147,4 +147,5 @@ with gr.Blocks() as demo:
       con_btn.click(fn=gptinfo,inputs=id_input,outputs=text_output)
 
 if __name__=="__main__":
+
    demo.launch(share=False)
