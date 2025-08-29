@@ -34,9 +34,7 @@
    flowchart TB
 
    A(複製全部專案檔案) --> B(填寫baseENV所有的資料)
-   B(填寫baseENV所有的資料) -->|run database_setup| C( 建立資料庫)
-   C(建立資料庫) -->|run DataCraptoDB| D(抓取資料並匯入資料庫)
-   D(抓取資料並匯入資料庫) -->|run main_app| E(開啟 <a href='http://127.0.0.1:7860/'>local link</a> 進行使用)
+   B(填寫baseENV所有的資料) -->|run main.py| C(開啟 <a href='http://127.0.0.1:7860/'>local link</a> 進行使用)
 
 ```
 ## **參考資料來源**
