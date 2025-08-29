@@ -38,5 +38,6 @@
 
 ```
 ## **參考資料來源**
-   - ### patentsview 美國專利局公開API 
-   - ### Finmind 台股相關資料平台
+   - ### [patentsview](https://search.patentsview.org/docs/docs/Search%20API/SearchAPIReference/#authentication) 美國專利局公開API 
+   - ### [Finmind](https://finmindtrade.com/) 台股相關資料平台
+   - ### [Gradio](https://www.gradio.app/) 使用平台呈現
