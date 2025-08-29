@@ -2,6 +2,8 @@ import requests
 import pandas as pd
 import json
 from sidepro.baseENV import *
+
+# 透過 finmind api 抓取股票資料，與計算相關指標
 class finmind_data:
     def __init__(self):
         self.token = login_data['token'] 
@@ -141,7 +143,7 @@ class finmind_data:
         })
         return PER_data
 
-
+# 透過 patentsview api 抓取專利資料
 class patent_data:
     def __init__(self):
         self.key = patentkey
@@ -162,7 +164,7 @@ class patent_data:
                 return leaf + 's'
         base_url = 'https://search.patentsview.org'
         endpoint = 'api/v1/patent'   
-
+        #因為API限制，僅抓取以申請時間為基準，回查1000篇專利資料
         param_dict = {
             "f" : ["patent_id", "patent_title", "patent_earliest_application_date","patent_date","patent_abstract","assignees.assignee_organization","cpc_current.cpc_group_id"],
             "o" : {"size":1000},

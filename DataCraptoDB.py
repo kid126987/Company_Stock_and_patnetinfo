@@ -7,7 +7,7 @@ from datetime import date
 FD = finmind_data()
 PD = patent_data()
 
-
+#公司檢索專利表格，以十間公司為範例
 stockbasedata = pd.DataFrame({
    'StockCode' : ['2330','2317','2454','2308','2382','2891','2881','3711','2882','2412'],
    'companyname' : ['TAIWAN SEMICONDUCTOR MANUFACTURING COMPANY',
@@ -22,8 +22,9 @@ stockbasedata = pd.DataFrame({
                     'Chunghwa Telecom Co., Ltd.']
    })
 
-
+#透過Findmind抓取各公司的DATA後，並針對預計要呈現的表格進行資料型態轉換
 def DBStockData(enddate :str):
+   #以程式運行的當下為基準點，回推抓取五年的資料
    startdate = enddate.replace(enddate.split('-')[0],str(int(enddate.split('-')[0])-5))
    stock_price_info_fin = None
    stock_revene_info_fin = None
@@ -50,7 +51,7 @@ def DBStockData(enddate :str):
          stock_PER_info_fin = pd.concat([stock_PER_info_fin,stock_PER_info])
    
    stock_Dividend_info_fin = stock_Dividend_info_fin.loc[stock_Dividend_info_fin['CashDividendPaymentDate']!='']
-   
+   #股票股價資訊
    stock_price_info_fin = pd.DataFrame({
       'StockCode' : pd.Series(stock_price_info_fin['stock_id'],dtype='str'),
       'StockDate' : [datetime.strptime(date_str, '%Y-%m-%d').date() for date_str in stock_price_info_fin['date']],
@@ -59,12 +60,14 @@ def DBStockData(enddate :str):
       'KValue' : pd.Series(stock_price_info_fin['K_value'],dtype='float'),
       'DValue' : pd.Series(stock_price_info_fin['D_value'],dtype='float')
       }).reset_index(drop=True)
+   #股票收益資訊
    stock_revene_info_fin = pd.DataFrame({
       'StockCode' : pd.Series(stock_revene_info_fin['stock_id'],dtype='str'),
       'RevenueYear' : pd.Series(stock_revene_info_fin['revenue_year'],dtype='int'),
       'RevenueMonth' : pd.Series(stock_revene_info_fin['revenue_month'],dtype='int'),
       'TotalRevenue' : pd.Series(stock_revene_info_fin['revenue'],dtype='float')
       }).reset_index(drop=True)
+   #股票股息資訊
    stock_Dividend_info_fin = pd.DataFrame({
       'StockCode' : pd.Series(stock_Dividend_info_fin['stock_id'],dtype='str'),
       'Dateinfo' : pd.Series(stock_Dividend_info_fin['year'],dtype='str'),
@@ -73,6 +76,7 @@ def DBStockData(enddate :str):
       'ExDividendDate' : [datetime.strptime(date_str, '%Y-%m-%d').date() for date_str in stock_Dividend_info_fin['CashExDividendTradingDate']],
       'CashDividendDate' : [datetime.strptime(date_str, '%Y-%m-%d').date() for date_str in stock_Dividend_info_fin['CashDividendPaymentDate']]
       }).reset_index(drop=True)
+   #股票PER資訊
    stock_PER_info_fin = pd.DataFrame({
       'StockCode' : pd.Series(stock_PER_info_fin['stock_id'],dtype='str'),
       'DateInfo' : [datetime.strptime(date_str, '%Y-%m-%d').date() for date_str in stock_PER_info_fin['date']],
@@ -86,7 +90,7 @@ def DBStockData(enddate :str):
            'stock_Dividend_info_to_DB':stock_Dividend_info_fin,
            'stock_PER_info_to_DB':stock_PER_info_fin}
    
-   
+#透過patentsview抓取各公司的DATA後，並針對預計要呈現的表格進行資料型態轉換   
 def DBPatnetData(nowdate : str):
    patent_main_fin = None
    patnet_cpc_fin = None
@@ -106,7 +110,7 @@ def DBPatnetData(nowdate : str):
          patnet_cpc_fin = pd.concat([patnet_cpc_fin,patent_main_data['patnet_cpc_data']])
          patent_text_fin = pd.concat([patent_text_fin,patent_main_data['patent_text_data']])
       
-         
+   #專利號碼、專利申請日與專利公開公告日      
    patent_main_fin = pd.DataFrame({
       'StockCode' : pd.Series(patent_main_fin['stockid'],dtype='str'), 
       'PatentNumber' : pd.Series(patent_main_fin['patentnumber'],dtype='str'),
@@ -115,12 +119,12 @@ def DBPatnetData(nowdate : str):
       'PatentApplicationDateYear' : pd.Series(patent_main_fin['patentapplicationdateyear'],dtype='int'),
       'PatentPubDateYear' : pd.Series(patent_main_fin['patentpubdateyear'],dtype='int')
       }).dropna().reset_index(drop=True)
-   
+   #專利技術分類號資訊
    patnet_cpc_fin = pd.DataFrame({
       'PatentNumber' : pd.Series(patnet_cpc_fin['patent_id'],dtype='str'),
       'PatnetCPCCode' : pd.Series(patnet_cpc_fin['CPC'],dtype='str')
       }).dropna().reset_index(drop=True)
-   
+   #專利標題與摘要資訊
    patent_text_fin = pd.DataFrame({
       'PatentNumber' : pd.Series(patent_text_fin['PatentNumber'],dtype='str'),
       'PatnetTitle' : pd.Series(patent_text_fin['PatnetTitle'],dtype='str'),
@@ -130,29 +134,38 @@ def DBPatnetData(nowdate : str):
    return {'patent_main_to_DB':patent_main_fin, 
            'patnet_cpc_to_DB':patnet_cpc_fin,
            'patent_text_to_DB':patent_text_fin}
-   
+
+
+
 todayinfo = date.today().strftime('%Y-%m-%d')
 engine = sqlalchemy.create_engine('sqlite:///stock_database.db', echo=False)
-print('DB_OK')
+#讀取公司基本資訊
 companydata = pd.read_parquet('company_baseinfo.parquet')
-print('companydata_OK')
+#透過公司表格與時間抓取股票資訊
 STOCK_data = DBStockData(todayinfo)
-print('stockdata_OK')
+#透過公司表格與時間抓取專利資訊
 PTAENT_data = DBPatnetData(todayinfo)
-print('patdata_OK')
 
 
-if __name__ == "__main__":
+
+def DatatoDB():
+   #匯入公司資訊進入先前建立的Data Base
    companydata.to_sql('CompanyBaseInfo', con=engine, if_exists='append',index=False)
    print('companytoDB_OK')
-   
+   #匯入股票資訊進入先前建立的Data Base
    STOCK_data['stock_price_info_to_DB'].to_sql('StockPriceInfo', con=engine, if_exists='append',index=False)
    STOCK_data['stock_revene_info_to_DB'].to_sql('stockRevenue', con=engine, if_exists='append',index=False)
    STOCK_data['stock_Dividend_info_to_DB'].to_sql('stockDividend', con=engine, if_exists='append',index=False)
    STOCK_data['stock_PER_info_to_DB'].to_sql('stockPERIndex', con=engine, if_exists='append',index=False)
    print("stockdatatoDB_OK!")
-   
+   #匯入專利資訊進入先前建立的Data Base
    PTAENT_data['patent_main_to_DB'].to_sql('PatentMain', con=engine, if_exists='append',index=False)
    PTAENT_data['patnet_cpc_to_DB'].to_sql('PatentClass', con=engine, if_exists='append',index=False)
    PTAENT_data['patent_text_to_DB'].to_sql('PatentText', con=engine, if_exists='append',index=False)
    print("patentdatatoDB_OK!")
+   
+   return print('allDB_OK')
+
+if __name__ == "__main__":
+   DatatoDB()
+   
