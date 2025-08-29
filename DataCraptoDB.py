@@ -1,4 +1,4 @@
-from sidepro.DataCrap import * 
+from DataCrap import * 
 from datetime import datetime
 from sqlalchemy import create_engine
 import sqlalchemy
@@ -168,4 +168,5 @@ def DatatoDB():
 
 if __name__ == "__main__":
    DatatoDB()
+
    
