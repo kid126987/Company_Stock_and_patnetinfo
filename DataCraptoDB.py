@@ -168,5 +168,4 @@ def DatatoDB():
 
 if __name__ == "__main__":
    DatatoDB()
-
    

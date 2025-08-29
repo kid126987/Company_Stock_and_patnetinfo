@@ -147,5 +147,4 @@ with gr.Blocks() as demo:
       con_btn.click(fn=gptinfo,inputs=id_input,outputs=text_output)
 
 if __name__=="__main__":
-
    demo.launch(share=False)
