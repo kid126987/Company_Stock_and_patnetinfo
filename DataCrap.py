@@ -1,7 +1,7 @@
 import requests
 import pandas as pd
 import json
-from sidepro.baseENV import *
+from baseENV import *
 
 # 透過 finmind api 抓取股票資料，與計算相關指標
 class finmind_data:
