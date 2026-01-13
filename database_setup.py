@@ -4,7 +4,7 @@ from pathlib import Path
 
 def check_and_create_database():
     """
-    檢查是否存在資料庫，如果沒有則使用sqlite3建立，並使用test_fixed.sql建立table
+    檢查是否存在資料庫，如果沒有則使用sqlite3建立，並使用DataModelInfo.sql建立table
     """
     # 設定資料庫路徑
     db_path = Path(__file__).parent / "stock_database.db"
@@ -42,7 +42,7 @@ def check_and_create_database():
             if statement:
                 try:
                     cursor.execute(statement)
-                    print(f"成功執行: {statement[:50]}...")
+                    #print(f"成功執行: {statement[:50]}...")
                 except sqlite3.Error as e:
                     print(f"執行SQL時發生錯誤: {e}")
                     print(f"問題語句: {statement}")
@@ -52,9 +52,9 @@ def check_and_create_database():
         print("資料庫和表格建立完成！")
         
         # 顯示建立的表格
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        tables = cursor.fetchall()
-        print(f"建立的表格: {[table[0] for table in tables]}")
+        #cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        #tables = cursor.fetchall()
+        #print(f"建立的表格: {[table[0] for table in tables]}")
         
     except Exception as e:
         print(f"建立資料庫時發生錯誤: {e}")

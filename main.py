@@ -23,7 +23,7 @@ def install_package(package):
 
 
 if __name__ == "__main__":
-   install_package(['requests','pandas','json','pathlib','sqlalchemy','google-generativeai','gradio','datetime','pyarrow','fastparquet'])
+   install_package(['requests','pandas','pathlib','sqlalchemy','google-generativeai','gradio','datetime','pyarrow','fastparquet'])
    
    from database_setup import *
    db_path = check_and_create_database()

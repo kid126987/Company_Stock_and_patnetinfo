@@ -15,6 +15,13 @@ stockdata_revenue = pd.read_sql('SELECT * FROM stockRevenue',engine)
 stockdata_Dividend = pd.read_sql('SELECT * FROM stockDividend',engine)
 stockdata_PER = pd.read_sql('SELECT * FROM stockPERIndex',engine)
 
+stockdata_Balance = pd.read_sql('SELECT * FROM StockBalance',engine)
+stockdata_Cashflow = pd.read_sql('SELECT * FROM StockCashflow',engine)
+stockdata_Financial = pd.read_sql('SELECT * FROM StockFinancial',engine)
+stockdata_InvestorsBuy = pd.read_sql('SELECT * FROM StockInvestorsBuy',engine)
+stockdata_News = pd.read_sql('SELECT * FROM StockNews',engine)
+
+
 patentcpc = pd.read_sql('SELECT * FROM PatentClass',engine) 
 patentmain = pd.read_sql('SELECT * FROM PatentMain',engine)
 patenttext = pd.read_sql('SELECT * FROM PatentText',engine)
@@ -35,11 +42,29 @@ def stockinfo(stock_id : str):
     stock_revenue = stock_revenue[['RevenueYear','RevenueMonth','TotalRevenue']]
     
     stock_dividend = stockdata_Dividend[stockdata_Dividend['StockCode']==stock_id]
-    stock_dividend = stock_dividend[['Dateinfo','CashDividends','StockDividend','ExDividendDate','CashDividendDate']]
+    stock_dividend = stock_dividend[['DateInfo','CashDividends','StockDividend','ExDividendDate','CashDividendDate']]
     
     stock_per = stockdata_PER[stockdata_PER['StockCode']==stock_id]
     stock_per = stock_per[['DateInfo','YieldRate','PER','PBR']].sort_values('DateInfo',ascending=False)
-    return stock_price_all,stock_revenue,stock_dividend,stock_per
+    
+    stock_balance = stockdata_Balance[stockdata_Balance['StockCode']==stock_id]
+    stock_balance = stock_balance[['DateInfo','Types','DataValue','OriginName']]
+   
+    stock_cashflow = stockdata_Cashflow[stockdata_Cashflow['StockCode']==stock_id]
+    stock_cashflow = stock_cashflow[['DateInfo','Types','DataValue','OriginName']]
+   
+    stock_financial = stockdata_Financial[stockdata_Financial['StockCode']==stock_id]
+    stock_financial = stock_financial[['DateInfo','Types','DataValue','OriginName']]
+   
+    stock_investorsBuy = stockdata_InvestorsBuy[stockdata_InvestorsBuy['StockCode']==stock_id]
+    stock_investorsBuy = stock_investorsBuy[['DateInfo','Buy','Names','Sell']]
+   
+    stock_news = stockdata_News[stockdata_News['StockCode']==stock_id]
+    stock_news = stock_news[['Title','PublishTime','NewsLink']]
+     
+    return stock_price_all,stock_revenue,stock_dividend,stock_per,stock_balance,stock_cashflow,stock_financial,stock_investorsBuy,stock_news
+
+
 #利用股票號碼提取Patent Data    
 def patentinfo(stock_id : str):
     patentmaindata = patentmain[patentmain['StockCode']==stock_id]
@@ -122,8 +147,25 @@ with gr.Blocks() as demo:
          stock_revenues = gr.Dataframe(label='stock_recenue_info')
          stock_dividends = gr.Dataframe(label='stock_dividend_info')
          stock_pers = gr.Dataframe(label='stock_per_info')
+         
+         stock_balances = gr.Dataframe(label='stock_balance_info')
+         stock_cashflows = gr.Dataframe(label='stock_cashflow_info')
+         stock_financials = gr.Dataframe(label='stock_financials_info')
+         stock_investorsBuys = gr.Dataframe(label='stock_investorsBuys_info')
+         stock_newss = gr.Dataframe(label='stock_newss_info')
+         
        
-      search_btn.click(fn=stockinfo,inputs=id_input,outputs=[stock_price_alls,stock_revenues,stock_dividends,stock_pers])      
+      search_btn.click(fn=stockinfo,
+                       inputs=id_input,
+                       outputs=[stock_price_alls,
+                                stock_revenues,
+                                stock_dividends,
+                                stock_pers,
+                                stock_balances,
+                                stock_cashflows,
+                                stock_financials,
+                                stock_investorsBuys,
+                                stock_newss])      
    
    
    with gr.Tab('patnet_info'):      

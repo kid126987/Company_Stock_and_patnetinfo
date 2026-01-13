@@ -1,12 +1,14 @@
 import requests
 import pandas as pd
 import json
+import feedparser
 from baseENV import *
 
 # 透過 finmind api 抓取股票資料，與計算相關指標
 class finmind_data:
     def __init__(self):
-        self.token = login_data['token'] 
+        self.token = login_data['token']
+    #每日收盤價資訊與KD值     
     def stock_price_info(self,stock_id : str,start_date : str,end_date : str):
         price_parameter = {
           "dataset": "TaiwanStockPrice",
@@ -20,7 +22,7 @@ class finmind_data:
         price_data = pd.DataFrame(price_data["data"])
         
         try :   
-          price_data = price_data[['date','stock_id','close']]
+          price_data = price_data[['date','stock_id','close','Trading_Volume','Trading_money']]
           price_data[['date_year','date_month','date_date']] = price_data['date'].str.split('-',n=2,expand=True)
           
           RSV_value=[]
@@ -52,15 +54,17 @@ class finmind_data:
           return price_data
         except:
           price_data = pd.DataFrame({
-            'date' : 'nodata',
+            'date' : '1000-01-01',
             'stock_id' : 'nodata',
-            'close' : 'nodata',
-            'date_year' : 'nodata',
-            'date_month' : 'nodata',
-            'date_date' : 'nodata',
-            'RSV_value' : 'nodata',
-            'K_value' : 'nodata',
-            'D_value' : 'nodata'
+            'close' : 0,
+            'Trading_Volume':0,
+            'Trading_money':0,
+            'date_year' : 0,
+            'date_month' : 0,
+            'date_date' : 0,
+            'RSV_value' : 0,
+            'K_value' : 0,
+            'D_value' : 0
           })
           
           return price_data
@@ -81,9 +85,9 @@ class finmind_data:
       except:
         revenue_data = pd.DataFrame({
           'stock_id':'nodata',
-          'revenue':'nodata',
-          'revenue_month':'nodata',
-          'revenue_year':'nodata'
+          'revenue':0,
+          'revenue_month':0,
+          'revenue_year':0
         })
         return revenue_data
     
@@ -111,13 +115,13 @@ class finmind_data:
       except:
         Dividend_data = pd.DataFrame({
           'stock_id':'nodata', 
-          'year':'nodata', 
-          'StockEarningsDistribution':'nodata',
-          'StockStatutorySurplus':'nodata',
-          'CashEarningsDistribution':'nodata', 
-          'CashStatutorySurplus':'nodata',
-          'CashExDividendTradingDate':'nodata', 
-          'CashDividendPaymentDate':'nodata'
+          'year':0, 
+          'StockEarningsDistribution':0,
+          'StockStatutorySurplus':0,
+          'CashEarningsDistribution':0, 
+          'CashStatutorySurplus':0,
+          'CashExDividendTradingDate':0, 
+          'CashDividendPaymentDate':0
         })
         
     def stock_PER_info(self,stock_id: str,start_date: str,end_date: str):
@@ -135,13 +139,110 @@ class finmind_data:
         return PER_data
       except:
         PER_data = pd.DataFrame({
-          'date':'nodata',	
+          'date':'1001-01-01',	
           'stock_id':'nodata',	
-          'dividend_yield':'nodata',	
-          'PER':'nodata',	
-          'PBR':'nodata'
+          'dividend_yield':0,	
+          'PER':0,	
+          'PBR':0
         })
         return PER_data
+      
+    def stock_financial_info(self,stock_id: str,start_date: str,end_date: str):
+      financial_parameter = {
+        "dataset": "TaiwanStockFinancialStatements",
+        "data_id": stock_id,
+        "start_date": start_date,
+        "end_date": end_date,
+        "token": self.token  
+        }
+      stock_financial = requests.get(data_url, params=financial_parameter)
+      financial_data = stock_financial.json()
+      try:
+        financial_data = pd.DataFrame(financial_data["data"])
+        return financial_data
+      except:
+        financial_data = pd.DataFrame({
+          'date':'1000-01-01',
+          'stock_id':'nodata',
+          'type':'nodata',
+          'value':0,
+          'origin_name':'nodata'
+        })
+        return financial_data
+     
+
+    def stock_balance_info(self,stock_id: str,start_date: str,end_date: str):
+          balance_parameter = {
+            "dataset": "TaiwanStockBalanceSheet",
+            "data_id": stock_id,
+            "start_date": start_date,
+            "end_date": end_date,
+            "token": self.token  
+            }
+          stock_balance = requests.get(data_url, params=balance_parameter)
+          balance_data = stock_balance.json()
+          try:
+            balance_data = pd.DataFrame(balance_data["data"])
+            return balance_data
+          except:
+            balance_data = pd.DataFrame({
+              'date':'1000-01-01',
+              'stock_id':'nodata',
+              'type':'nodata',
+              'value':0,
+              'origin_name':'nodata'
+            })
+            return balance_data
+
+
+    def stock_cashflow_info(self,stock_id: str,start_date: str,end_date: str):
+      cashflow_parameter = {
+        "dataset": "TaiwanStockCashFlowsStatement",
+        "data_id": stock_id,
+        "start_date": start_date,
+        "end_date": end_date,
+        "token": self.token  
+        }
+      stock_cashflow = requests.get(data_url, params=cashflow_parameter)
+      cashflow_data = stock_cashflow.json()
+      try:
+        cashflow_data = pd.DataFrame(cashflow_data["data"])
+        return cashflow_data
+      except:
+        cashflow_data = pd.DataFrame({
+          'date':'1000-01-01',
+          'stock_id':'nodata',
+          'type':'nodata',
+          'value':0,
+          'origin_name':'nodata'
+        })
+        return cashflow_data
+      
+    def stock_InvestorsBuy_info(self,stock_id: str,start_date: str,end_date: str):
+      InvestorsBuy_parameter = {
+        "dataset": "TaiwanStockInstitutionalInvestorsBuySell",
+        "data_id": stock_id,
+        "start_date": start_date,
+        "end_date": end_date,
+        "token": self.token  
+        }
+      stock_InvestorsBuy = requests.get(data_url, params=InvestorsBuy_parameter)
+      InvestorsBuy_data = stock_InvestorsBuy.json()
+      try:
+        InvestorsBuy_data = pd.DataFrame(InvestorsBuy_data["data"])
+        return InvestorsBuy_data
+      except:
+        InvestorsBuy_data = pd.DataFrame({
+          'date':'1000-01-01',
+          'stock_id':'nodata',
+          'buy':0,
+          'name':'nodata',
+          'sell':0
+        })
+        return InvestorsBuy_data  
+      
+      
+      
 
 # 透過 patentsview api 抓取專利資料
 class patent_data:
@@ -208,4 +309,21 @@ class patent_data:
 
         return {'patent_main_data' : patent_main_data,'patent_text_data' : patent_text_data,'patnet_cpc_data' : patnet_cpc_data}
         
+# 透過 googlenews RSS 抓取google新聞資料
+class googlenews_data:
+    def __init__(self):
+          pass
+    def googlenewssearch(self,kw:str,country:str):
+      url = f'https://news.google.com/rss/search?q={kw}&gl={country}'
+      google_rss_data = feedparser.parse(url)
+      if google_rss_data['entries']==[]:
+          googlenews_fin_data = pd.DataFrame({
+              'title' : 'nodata',
+              'published' : 'nodata' ,
+              'link' : 'nodata'
+          },index=[0])
+          return googlenews_fin_data
+      else :
+          googlenews_fin_data = pd.json_normalize(google_rss_data['entries'])[['title','published','link']]
+          return googlenews_fin_data
         
