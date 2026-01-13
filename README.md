@@ -1,5 +1,5 @@
 ## **專案目的**
-   該項目主要提供目前上市上櫃的公司，透過提供股票基本面資訊與美國專利技術分析，給予投資者進行投資的參考資料，並整合生成式AI，綜合股票與專利資訊，分析公司主要技術與基本面分析。
+   該項目主要提供目前台灣10間上市上櫃的公司，透過提供股票基本面資訊、美國專利與新聞資訊進行技術分析，給予投資者進行投資的參考資料，並整合生成式AI，綜合股票與專利資訊，分析公司主要技術與基本面分析。
 ## **專案說明**
    - ### **公司基本資料**
       - 包含公司中英文名稱、官方網站、Email、創辦人、公司位置等
@@ -7,9 +7,12 @@
       - 五年內的股價分布、營收表、股利股息表與股價的PER等
    - ### **專利資料**
       - 專利申請量、最新申請的1000篇專利清單、專利技術分類(CPC)申請量
+   - ### **Google 新聞資料**   
+      - 透過 google RSS 蒐集美國、日本與台灣的新聞資料
 ## **專案資料來源**
-   - ### 股票資料:Finmind
-   - ### 專利資料:patentsView (USPTO)
+   - ### 股票資料 : Finmind
+   - ### 專利資料 : PatentsView (USPTO)
+   - ### 新聞資料 : Google RSS
 ## **專案檔案說明**
    - ### 專案檔案
       - ### baseENV
@@ -19,15 +22,15 @@
       - ### company_baseinfo
          - 公司基本資料資訊，主要透過下載Goodinfo資料
       - ### DataModelinfo
-         - SQL中各Table的DataModel
+         - 資料庫中每張Table的DataModel
       - ### database_setup
          - 檢測並建立SQLite資料庫，並使用DataModelinfo建立table
       - ### DataCrap
-         - 串接patentsview與finmind的API
+         - 串接patentsview與finmind的API工具
       - ### DataCraptoDB
          - 透過DataCrap抓取特定公司資料與既定年份與筆數資料，並匯入SQLite
       - ### main_app
-         - 透過讀取資料，並透過資料轉換，並用Gradio在本地端創建簡易的操作前台
+         - 專案執行檔，透過讀取資料，並透過資料轉換，並用Gradio在本地端創建簡易的操作前台
 ## **專案使用方式**
 
 ```mermaid
@@ -37,6 +40,11 @@
    B(填寫baseENV所有的資料) -->|run main.py| C(開啟 <a href='http://127.0.0.1:7860/'>local link</a> 進行使用)
 
 ```
+## **參考資料來源**
+   - ### [patentsview](https://search.patentsview.org/docs/docs/Search%20API/SearchAPIReference/#authentication) 美國專利局公開API 
+   - ### [Finmind](https://finmindtrade.com/) 台股相關資料平台
+   - ### [Gradio](https://www.gradio.app/) 使用平台呈現
+
 ## **參考資料來源**
    - ### [patentsview](https://search.patentsview.org/docs/docs/Search%20API/SearchAPIReference/#authentication) 美國專利局公開API 
    - ### [Finmind](https://finmindtrade.com/) 台股相關資料平台
